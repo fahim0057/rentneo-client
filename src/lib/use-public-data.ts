@@ -13,7 +13,7 @@ export function usePublicData<T>(path: string): State<T> {
 
   useEffect(() => {
     let active = true;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, { cache: "no-store" })
       .then(async (res) => {
         const body = await res.json().catch(() => null);
         if (!res.ok) throw new Error(body?.message ?? `Request failed (${res.status})`);

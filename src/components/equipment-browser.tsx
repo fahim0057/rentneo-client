@@ -47,15 +47,25 @@ export function EquipmentBrowser() {
     const params = new URLSearchParams(queryString);
     params.set("limit", String(PAGE_SIZE));
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/equipment?${params}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/equipment?${params}`, { cache: "no-store" })
       .then(async (res) => {
         const body = await res.json().catch(() => null);
         if (!res.ok) throw new Error(body?.message ?? `Request failed (${res.status})`);
         return body;
       })
       .then((body) => {
-        if (active)
-          setResult({ key: queryString, items: body.data, pagination: body.pagination, error: null });
+        if (!active) return;
+
+        // A hand-edited URL can point past the last page; move to the last real page.
+        const totalPages = Number(body.pagination?.totalPages) || 0;
+        const requested = Number(params.get("page") ?? 1);
+        if (totalPages > 0 && Number.isFinite(requested) && requested > totalPages) {
+          params.set("page", String(totalPages));
+          router.replace(`/equipment?${params}`, { scroll: false });
+          return;
+        }
+
+        setResult({ key: queryString, items: body.data, pagination: body.pagination, error: null });
       })
       .catch((err: Error) => {
         if (active) setResult({ key: queryString, items: [], pagination: null, error: err.message });
@@ -64,7 +74,7 @@ export function EquipmentBrowser() {
     return () => {
       active = false;
     };
-  }, [queryString, attempt]);
+  }, [queryString, attempt, router]);
 
   // Loading is derived: results belong to a different query than the one in the URL.
   const loading = result?.key !== queryString;
