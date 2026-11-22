@@ -16,7 +16,10 @@ const NAV: Record<Role, { href: string; label: string }[]> = {
     { href: "/dashboard/owner/add-equipment", label: "Add Equipment" },
     { href: "/dashboard/owner/my-equipment", label: "My Equipment" },
   ],
-  admin: [],
+  admin: [
+    { href: "/dashboard/admin/users", label: "All Users" },
+    { href: "/dashboard/admin/equipment", label: "All Equipment" },
+  ],
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

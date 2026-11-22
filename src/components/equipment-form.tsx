@@ -14,7 +14,13 @@ import { Textarea } from "@/components/ui/textarea";
 const selectClass =
   "h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
-export function EquipmentForm({ initial }: { initial?: Equipment }) {
+export function EquipmentForm({
+  initial,
+  redirectTo = "/dashboard/owner/my-equipment",
+}: {
+  initial?: Equipment;
+  redirectTo?: string;
+}) {
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const [image, setImage] = useState(initial?.image ?? "");
@@ -69,12 +75,16 @@ export function EquipmentForm({ initial }: { initial?: Equipment }) {
           method: "PUT",
           body: JSON.stringify(payload),
         });
-        toast.success("Equipment updated. It will be reviewed again by an admin.");
+        toast.success(
+          session?.user.role === "admin"
+            ? "Equipment updated."
+            : "Equipment updated. It will be reviewed again by an admin."
+        );
       } else {
         await apiFetch("/api/equipment", { method: "POST", body: JSON.stringify(payload) });
         toast.success("Equipment submitted for approval.");
       }
-      router.push("/dashboard/owner/my-equipment");
+      router.push(redirectTo);
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
