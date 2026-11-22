@@ -2,15 +2,14 @@
 
 import Link from "next/link";
 import { MapPin } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
 import { buttonVariants } from "@/components/ui/button";
 import type { Equipment } from "@/lib/equipment";
 
 export function EquipmentCard({ item }: { item: Equipment }) {
-  const { data: session } = authClient.useSession();
   const inStock = item.availableQuantity > 0;
-  // Logged-out visitors are sent to Login, as the brief requires
-  const href = session ? `/equipment/${item._id}` : "/login";
+  // The detail page handles the logged-out redirect, so the link stays stable
+  // even while the session is still loading.
+  const href = `/equipment/${item._id}`;
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-xl border bg-card text-card-foreground transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg">
