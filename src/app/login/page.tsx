@@ -30,7 +30,13 @@ export default function LoginPage() {
       return;
     }
     toast.success("Logged in successfully.");
-    router.push("/");
+    // Only allow same-origin paths so ?next= cannot be used as an open redirect.
+    const next = new URLSearchParams(window.location.search).get("next");
+    const safeNext =
+      next && next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")
+        ? next
+        : "/";
+    router.push(safeNext);
     router.refresh();
   }
 

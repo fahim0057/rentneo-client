@@ -44,7 +44,12 @@ export default function RegisterPage() {
       return;
     }
     toast.success(`Account created. Welcome to ${SITE_NAME}!`);
-    router.push("/");
+    const next = new URLSearchParams(window.location.search).get("next");
+    const safeNext =
+      next && next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")
+        ? next
+        : "/";
+    router.push(safeNext);
     router.refresh();
   }
 
