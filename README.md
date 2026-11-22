@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RentNeo Client
 
-## Getting Started
+Next.js 16 app for the RentNeo equipment rental marketplace. It also hosts the
+Better Auth server (email/password + Google) that issues the JWTs consumed by
+`rentneo-server`.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Copy `.env.example` to `.env.local` and fill in the values.
+2. `npm install`
+3. `npm run dev` (http://localhost:3000)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The API server must be running separately; `NEXT_PUBLIC_API_URL` points at it.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Purpose |
+| --- | --- |
+| `BETTER_AUTH_SECRET` | Better Auth signing/encryption secret |
+| `BETTER_AUTH_URL` | Public origin of this app; must equal the API's `AUTH_URL` |
+| `MONGODB_URI` | Atlas/local MongoDB connection string |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials |
+| `NEXT_PUBLIC_API_URL` | Base URL of `rentneo-server` |
+| `IMGBB_API_KEY` | ImgBB key used by `/api/upload` |
 
-## Learn More
+## Roles
 
-To learn more about Next.js, take a look at the following resources:
+- `customer` — browse equipment
+- `owner` — list and manage equipment
+- `admin` — review equipment and manage user roles
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+New users are `customer`; an admin promotes them from
+`/dashboard/admin/users`. Any signed-in user may rent; listing requires the
+`owner` role.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Structure
 
-## Deploy on Vercel
+- `src/app/api/auth/[...all]` — Better Auth handler (including `/jwks` and `/token`)
+- `src/app/api/upload` — authenticated ImgBB upload
+- `src/app/equipment` — public catalogue and item detail page
+- `src/app/dashboard` — role-gated owner/admin dashboards
+- `src/lib/api.ts` — authenticated fetch helper (gets a JWT, adds `Authorization`)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` — development server
+- `npm run build` — production build
+- `npm run start` — serve the build
+- `npm run lint` — ESLint
