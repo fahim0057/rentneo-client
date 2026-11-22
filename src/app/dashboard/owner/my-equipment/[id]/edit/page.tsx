@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
@@ -8,6 +8,16 @@ import type { Equipment } from "@/lib/equipment";
 import { EquipmentForm } from "@/components/equipment-form";
 
 export default function EditEquipmentPage() {
+  return (
+    <Suspense
+      fallback={<p className="py-10 text-center text-muted-foreground">Loading...</p>}
+    >
+      <EditEquipment />
+    </Suspense>
+  );
+}
+
+function EditEquipment() {
   const { id } = useParams<{ id: string }>();
   const { data: session } = authClient.useSession();
   const [item, setItem] = useState<Equipment | null>(null);

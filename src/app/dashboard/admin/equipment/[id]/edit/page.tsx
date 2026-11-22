@@ -1,12 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import type { Equipment } from "@/lib/equipment";
 import { EquipmentForm } from "@/components/equipment-form";
 
 export default function AdminEditEquipmentPage() {
+  return (
+    <Suspense
+      fallback={<p className="py-10 text-center text-muted-foreground">Loading...</p>}
+    >
+      <AdminEditEquipment />
+    </Suspense>
+  );
+}
+
+function AdminEditEquipment() {
   const { id } = useParams<{ id: string }>();
   const [item, setItem] = useState<Equipment | null>(null);
   const [loading, setLoading] = useState(true);
