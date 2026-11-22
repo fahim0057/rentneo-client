@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -14,7 +14,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isPending || !session) return;
+
+    const next = new URLSearchParams(window.location.search).get("next");
+    const safeNext =
+      next && next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")
+        ? next
+        : "/";
+    router.replace(safeNext);
+  }, [isPending, session, router]);
+
+  if (isPending || session) {
+    return <p className="p-10 text-center text-muted-foreground">Loading...</p>;
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

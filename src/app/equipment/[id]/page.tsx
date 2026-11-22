@@ -24,12 +24,20 @@ function EquipmentDetail() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
-  const [item, setItem] = useState<Equipment | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const userId = session?.user.id;
+  const [state, setState] = useState<{
+    id: string | null;
+    item: Equipment | null;
+    error: string | null;
+  }>({ id: null, item: null, error: null });
+
+  // No result for this id yet means the request is still in flight.
+  const loading = state.id !== id;
+  const item = state.item;
 
   useEffect(() => {
     if (isPending) return;
-    if (!session) {
+    if (!userId) {
       router.replace(`/login?next=${encodeURIComponent(`/equipment/${id}`)}`);
       return;
     }
@@ -37,25 +45,25 @@ function EquipmentDetail() {
     let active = true;
     apiFetch<{ data: Equipment }>(`/api/equipment/${id}`)
       .then((res) => {
-        if (active) setItem(res.data);
+        if (active) setState({ id, item: res.data, error: null });
       })
       .catch((err: Error) => {
-        if (active) setError(err.message);
+        if (active) setState({ id, item: null, error: err.message });
       });
     return () => {
       active = false;
     };
-  }, [id, isPending, session, router]);
+  }, [id, isPending, userId, router]);
 
-  if (isPending || (!session && !error)) {
+  if (isPending || !session || loading) {
     return <p className="p-10 text-center text-muted-foreground">Loading...</p>;
   }
 
-  if (error || !item) {
+  if (state.error || !item) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
         <p className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
-          {error ?? "Equipment not found."}
+          {state.error ?? "Equipment not found."}
         </p>
         <Link
           href="/equipment"
