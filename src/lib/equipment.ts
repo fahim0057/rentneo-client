@@ -28,6 +28,8 @@ export interface Equipment {
   status: EquipmentStatus;
   ownerId: string;
   ownerName: string;
-  ownerEmail: string;
+  /** Only present for admins and the owner; omitted from public listings. */
+  ownerEmail?: string;
   createdAt: string;
+  updatedAt?: string;
 }

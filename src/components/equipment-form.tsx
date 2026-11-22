@@ -176,7 +176,12 @@ export function EquipmentForm({
       </div>
 
       <div className="rounded-md border bg-muted/40 p-3 text-sm md:col-span-2">
-        <p><span className="font-medium">Status:</span> Pending (until an admin approves)</p>
+        <p>
+          <span className="font-medium">Status:</span>{" "}
+          {initial && session?.user.role === "admin"
+            ? `Kept as ${initial.status}`
+            : "Pending (until an admin approves)"}
+        </p>
         <p><span className="font-medium">Owner:</span>{" "}
           {initial?.ownerName ?? session?.user.name} ({initial?.ownerEmail ?? session?.user.email})
         </p>
