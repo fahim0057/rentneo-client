@@ -15,8 +15,23 @@ const ACTIONS: Record<Role, { href: string; label: string; text: string }[]> = {
       label: "Browse equipment",
       text: "Search and filter approved equipment from verified owners.",
     },
+    {
+      href: "/dashboard/bookings",
+      label: "My rentals",
+      text: "Track payments and the status of every booking you have made.",
+    },
+    {
+      href: "/dashboard/favorites",
+      label: "Favorites",
+      text: "Your saved equipment, ready to book when you need it.",
+    },
   ],
   owner: [
+    {
+      href: "/dashboard/owner/bookings",
+      label: "Rental requests",
+      text: "Confirm, activate and complete bookings for your equipment.",
+    },
     {
       href: "/dashboard/owner/my-equipment",
       label: "My equipment",
@@ -27,8 +42,18 @@ const ACTIONS: Record<Role, { href: string; label: string; text: string }[]> = {
       label: "Add equipment",
       text: "List a new item. It will be reviewed by an admin before going live.",
     },
+    {
+      href: "/dashboard/owner/analytics",
+      label: "Analytics",
+      text: "See your earnings, rental counts and monthly performance.",
+    },
   ],
   admin: [
+    {
+      href: "/dashboard/admin/bookings",
+      label: "All bookings",
+      text: "Review every rental, payment state and fulfilment status.",
+    },
     {
       href: "/dashboard/admin/equipment",
       label: "Review equipment",
@@ -38,6 +63,11 @@ const ACTIONS: Record<Role, { href: string; label: string; text: string }[]> = {
       href: "/dashboard/admin/users",
       label: "Manage users",
       text: "Promote customers to owners or admins, and review accounts.",
+    },
+    {
+      href: "/dashboard/admin/analytics",
+      label: "Platform analytics",
+      text: "Track users, listings, bookings and revenue across the marketplace.",
     },
   ],
 };

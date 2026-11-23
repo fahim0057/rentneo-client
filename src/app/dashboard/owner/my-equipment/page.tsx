@@ -98,7 +98,7 @@ export default function MyEquipmentPage() {
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>{item.category}</TableCell>
                   <TableCell>
-                    ${item.rentalPrice} / {item.rentalType}
+                    ৳{item.rentalPrice} / {item.rentalType}
                   </TableCell>
                   <TableCell>{item.availableQuantity}</TableCell>
                   <TableCell>

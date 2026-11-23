@@ -119,7 +119,7 @@ export function EquipmentForm({
         <Input id="location" name="location" required defaultValue={initial?.location} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="rentalPrice">Rental price (USD)</Label>
+        <Label htmlFor="rentalPrice">Rental price (BDT)</Label>
         <Input id="rentalPrice" name="rentalPrice" type="number" required min="1" step="0.01"
                defaultValue={initial?.rentalPrice} />
       </div>

@@ -10,15 +10,26 @@ type Role = "customer" | "owner" | "admin";
 const ROLES: Role[] = ["customer", "owner", "admin"];
 
 // Add entries here as we build each page
+const SHARED: { href: string; label: string }[] = [
+  { href: "/dashboard/bookings", label: "My Rentals" },
+  { href: "/dashboard/favorites", label: "Favorites" },
+];
+
 const NAV: Record<Role, { href: string; label: string }[]> = {
-  customer: [],
+  customer: SHARED,
   owner: [
-    { href: "/dashboard/owner/add-equipment", label: "Add Equipment" },
+    ...SHARED,
+    { href: "/dashboard/owner/bookings", label: "Rental Requests" },
     { href: "/dashboard/owner/my-equipment", label: "My Equipment" },
+    { href: "/dashboard/owner/add-equipment", label: "Add Equipment" },
+    { href: "/dashboard/owner/analytics", label: "Analytics" },
   ],
   admin: [
+    ...SHARED,
+    { href: "/dashboard/admin/bookings", label: "All Bookings" },
     { href: "/dashboard/admin/users", label: "All Users" },
     { href: "/dashboard/admin/equipment", label: "All Equipment" },
+    { href: "/dashboard/admin/analytics", label: "Analytics" },
   ],
 };
 

@@ -33,7 +33,7 @@ export function EquipmentCard({ item }: { item: Equipment }) {
         </p>
         <div className="mt-auto flex items-end justify-between pt-4">
           <p>
-            <span className="text-xl font-bold">${item.rentalPrice}</span>
+            <span className="text-xl font-bold">৳{item.rentalPrice}</span>
             <span className="text-sm text-muted-foreground"> / {item.rentalType}</span>
           </p>
           <Link href={href} className={buttonVariants({ size: "sm" })}>

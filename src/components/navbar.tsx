@@ -79,6 +79,12 @@ export function Navbar() {
                 <DropdownMenuItem onClick={() => router.push("/dashboard")}>
                   Dashboard
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/bookings")}>
+                  My Rentals
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/favorites")}>
+                  Favorites
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -114,6 +120,12 @@ export function Navbar() {
             <>
               <Link href="/dashboard" onClick={() => setOpen(false)} className="block py-1">
                 Dashboard
+              </Link>
+              <Link href="/dashboard/bookings" onClick={() => setOpen(false)} className="block py-1">
+                My Rentals
+              </Link>
+              <Link href="/dashboard/favorites" onClick={() => setOpen(false)} className="block py-1">
+                Favorites
               </Link>
               <button onClick={handleLogout} className="block py-1">Logout</button>
             </>

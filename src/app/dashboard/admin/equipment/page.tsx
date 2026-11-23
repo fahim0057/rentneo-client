@@ -149,7 +149,7 @@ export default function AdminEquipmentPage() {
                   </TableCell>
                   <TableCell>{item.category}</TableCell>
                   <TableCell>
-                    ${item.rentalPrice} / {item.rentalType}
+                    ৳{item.rentalPrice} / {item.rentalType}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={item.status} />
