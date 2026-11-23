@@ -1,12 +1,12 @@
 "use client";
-
+import { Logo } from "@/components/logo";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-import { SITE_NAME } from "@/lib/constants";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -40,9 +40,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold tracking-tight">
-          {SITE_NAME}
-        </Link>
+                <Logo />
 
         <nav className="hidden items-center gap-6 md:flex">
           {links.map((l) => (
@@ -57,7 +55,8 @@ export function Navbar() {
           )}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
+          <ThemeToggle />
           {isPending ? (
             <div className="h-9 w-24" />
           ) : user ? (
@@ -103,13 +102,15 @@ export function Navbar() {
           )}
         </div>
 
-        <button
-          className="md:hidden"
-          aria-label="Toggle menu"
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X /> : <Menu />}
-        </button>
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle />
+          <button
+            aria-label="Toggle menu"
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X /> : <Menu />}
+          </button>
+        </div>
       </div>
 
       {open && (

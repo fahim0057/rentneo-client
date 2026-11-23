@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE_NAME, COPYRIGHT_YEAR } from "@/lib/constants";
+import { Logo } from "@/components/logo";
 
 function XIcon({ className }: { className?: string }) {
   return (
@@ -14,7 +15,7 @@ export function Footer() {
     <footer className="mt-16 border-t bg-muted/40">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-3">
         <div>
-          <p className="text-xl font-bold">{SITE_NAME}</p>
+          <Logo />
           <p className="mt-2 text-sm text-muted-foreground">
             Rent the equipment you need, or earn from the equipment you own.
           </p>

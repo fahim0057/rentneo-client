@@ -9,6 +9,7 @@ import {
   StatCard,
   type MonthlyActivity,
 } from "@/components/analytics";
+import { MonthlyChart } from "@/components/monthly-chart";
 import { buttonVariants } from "@/components/ui/button";
 
 interface OwnerAnalytics {
@@ -84,7 +85,20 @@ export default function OwnerAnalyticsPage() {
             />
           </div>
 
-          <h2 className="mt-8 mb-3 text-lg font-semibold">Last 12 months</h2>
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <MonthlyChart
+              rows={data.monthly}
+              metric="bookings"
+              title="Bookings per month"
+            />
+            <MonthlyChart
+              rows={data.monthly}
+              metric="revenue"
+              title="Earnings per month"
+            />
+          </div>
+
+          <h2 className="mt-8 mb-3 text-lg font-semibold">Monthly detail</h2>
           <MonthlyActivityTable rows={data.monthly} />
         </>
       )}

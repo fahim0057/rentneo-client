@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,7 @@ interface ProfileUser {
   name: string;
   email: string;
   role?: string | null;
+  image?: string | null;
   phone?: string | null;
   address?: string | null;
 }
@@ -35,9 +37,37 @@ function ProfileForm({
   onSaved: () => Promise<void>;
 }) {
   const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+  const [image, setImage] = useState(user.image ?? "");
   const [phone, setPhone] = useState(user.phone ?? "");
   const [address, setAddress] = useState(user.address ?? "");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const body = (await res.json().catch(() => null)) as
+        | { url?: string; message?: string }
+        | null;
+      if (!res.ok || !body?.url) {
+        throw new Error(body?.message ?? "Upload failed");
+      }
+      setImage(body.url);
+      toast.success("Photo uploaded. Save to apply it.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not upload photo");
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,10 +78,25 @@ function ProfileForm({
       return;
     }
 
+    const trimmedEmail = email.trim().toLowerCase();
     setSaving(true);
     try {
+      if (trimmedEmail !== user.email.toLowerCase()) {
+        const res = await fetch("/api/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: trimmedEmail }),
+        });
+        const body = (await res.json().catch(() => null)) as { message?: string } | null;
+        if (!res.ok) {
+          toast.error(body?.message ?? "Could not update your email");
+          return;
+        }
+      }
+
       const { error } = await authClient.updateUser({
         name: trimmedName,
+        image: image.trim(),
         phone: phone.trim(),
         address: address.trim(),
       });
@@ -77,6 +122,39 @@ function ProfileForm({
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border bg-card p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <Avatar className="h-16 w-16 shrink-0">
+            <AvatarImage src={image || undefined} alt={name} />
+            <AvatarFallback>{name.charAt(0).toUpperCase() || "?"}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="profile-image">Profile photo</Label>
+            <Input
+              id="profile-image"
+              type="url"
+              placeholder="https://example.com/photo.jpg"
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
+            />
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                id="profile-file"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleFile}
+                disabled={uploading}
+                className="max-w-64"
+              />
+              {uploading && (
+                <span className="text-xs text-muted-foreground">Uploading...</span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Paste a direct image link or upload a JPG, PNG, WEBP or GIF (max 4 MB).
+            </p>
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="profile-name">Full name</Label>
           <Input
@@ -91,9 +169,16 @@ function ProfileForm({
 
         <div className="space-y-2">
           <Label htmlFor="profile-email">Email</Label>
-          <Input id="profile-email" value={user.email} readOnly disabled />
+          <Input
+            id="profile-email"
+            type="email"
+            required
+            maxLength={254}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
           <p className="text-xs text-muted-foreground">
-            Email changes are not available here yet.
+            Used to sign in. Changing it updates your login email immediately.
           </p>
         </div>
 

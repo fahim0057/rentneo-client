@@ -140,6 +140,7 @@ export default function MyBookingsPage() {
                 <TableRow>
                   <TableHead>Equipment</TableHead>
                   <TableHead>Dates</TableHead>
+                  <TableHead>Booking date</TableHead>
                   <TableHead>Qty</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead>Payment</TableHead>
@@ -159,6 +160,9 @@ export default function MyBookingsPage() {
                     </TableCell>
                     <TableCell>
                       {formatDate(booking.startDate)} → {formatDate(booking.endDate)}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {formatDate(booking.createdAt)}
                     </TableCell>
                     <TableCell>{booking.quantity}</TableCell>
                     <TableCell>{formatBDT(booking.totalAmount)}</TableCell>

@@ -5,8 +5,16 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import type { Equipment } from "@/lib/equipment";
-import { EquipmentCard } from "@/components/equipment-card";
+import { formatBDT } from "@/lib/format";
 import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function FavoritesPage() {
   const [items, setItems] = useState<Equipment[]>([]);
@@ -69,20 +77,70 @@ export default function FavoritesPage() {
       )}
 
       {!loading && !error && items.length > 0 && (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {items.map((item) => (
-            <div key={item._id} className="flex flex-col gap-2">
-              <EquipmentCard item={item} />
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={removingId === item._id}
-                onClick={() => remove(item)}
-              >
-                {removingId === item._id ? "Removing..." : "Remove"}
-              </Button>
-            </div>
-          ))}
+        <div className="overflow-x-auto rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Equipment</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Availability</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((item) => (
+                <TableRow key={item._id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-10 w-14 rounded object-cover"
+                      />
+                      <div>
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {item.brand} {item.model}
+                        </p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{item.category}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {formatBDT(item.rentalPrice)}{" "}
+                    <span className="text-xs text-muted-foreground">/ {item.rentalType}</span>
+                  </TableCell>
+                  <TableCell>{item.location}</TableCell>
+                  <TableCell>
+                    {item.availableQuantity > 0
+                      ? `${item.availableQuantity} available`
+                      : "Unavailable"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <Link
+                        href={`/equipment/${item._id}`}
+                        className={buttonVariants({ variant: "outline", size: "sm" })}
+                      >
+                        View details
+                      </Link>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        disabled={removingId === item._id}
+                        onClick={() => remove(item)}
+                      >
+                        {removingId === item._id ? "Removing..." : "Remove"}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

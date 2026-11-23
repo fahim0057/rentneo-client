@@ -59,13 +59,14 @@ export function Hero() {
           className="mx-auto w-full max-w-md md:max-w-none"
         >
           <Image
-            src="/hero-equipment.webp"
-            alt="Generator, power drill, laptop, speaker, projector and ladder ready for rent"
-            width={900}
-            height={900}
-            priority
-            className="aspect-square w-full rounded-2xl border object-cover shadow-2xl"
-          />
+          src="/hero-illustration.svg"
+                    alt="An excavator, a camera on a tripod, a speaker and a ladder against an ember sunset"
+                      width={900}
+                      height={900}
+                       priority
+                                unoptimized
+                      className="aspect-square w-full rounded-2xl border object-cover shadow-2xl"
+/>
         </motion.div>
       </div>
     </section>
