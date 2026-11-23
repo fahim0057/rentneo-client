@@ -13,6 +13,7 @@ const ROLES: Role[] = ["customer", "owner", "admin"];
 const SHARED: { href: string; label: string }[] = [
   { href: "/dashboard/bookings", label: "My Rentals" },
   { href: "/dashboard/favorites", label: "Favorites" },
+  { href: "/dashboard/profile", label: "Profile" },
 ];
 
 const NAV: Record<Role, { href: string; label: string }[]> = {

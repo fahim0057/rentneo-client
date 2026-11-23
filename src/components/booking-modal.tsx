@@ -24,8 +24,8 @@ export function BookingModal({ equipment, onClose }: Props) {
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(addDaysInput(today, 1));
   const [quantity, setQuantity] = useState(1);
-  const [contactNumber, setContactNumber] = useState("");
-  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [contactNumber, setContactNumber] = useState(session?.user.phone ?? "");
+  const [deliveryAddress, setDeliveryAddress] = useState(session?.user.address ?? "");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

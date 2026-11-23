@@ -2,10 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import type { Booking } from "@/lib/bookings";
+import type { Review } from "@/lib/reviews";
 import { formatBDT, formatDate } from "@/lib/format";
 import { BookingStatusBadge, PaymentStatusBadge } from "@/components/booking-status-badge";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { ReviewModal } from "@/components/review-modal";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Table,
@@ -34,6 +38,10 @@ export default function MyBookingsPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reviewed, setReviewed] = useState<Record<string, Review>>({});
+  const [reviewTarget, setReviewTarget] = useState<Booking | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
+  const [cancelBusy, setCancelBusy] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -51,6 +59,20 @@ export default function MyBookingsPage() {
       .finally(() => {
         if (active) setLoading(false);
       });
+
+    apiFetch<{ data: Review[] }>("/api/reviews/mine")
+      .then((res) => {
+        if (!active) return;
+        const map: Record<string, Review> = {};
+        for (const review of res.data) {
+          if (review.bookingId) map[review.bookingId] = review;
+        }
+        setReviewed(map);
+      })
+      .catch(() => {
+        /* Review state is secondary; the rental list still works without it. */
+      });
+
     return () => {
       active = false;
     };
@@ -61,6 +83,24 @@ export default function MyBookingsPage() {
     setError(null);
     setLoading(true);
     setPage(next);
+  }
+
+  async function cancelBooking() {
+    if (!cancelTarget) return;
+    setCancelBusy(true);
+    try {
+      const res = await apiFetch<{ data: Booking }>(
+        `/api/bookings/${cancelTarget._id}/cancel`,
+        { method: "POST" }
+      );
+      setItems((prev) => prev.map((b) => (b._id === res.data._id ? res.data : b)));
+      toast.success("Booking cancelled.");
+      setCancelTarget(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not cancel booking");
+    } finally {
+      setCancelBusy(false);
+    }
   }
 
   return (
@@ -128,13 +168,41 @@ export default function MyBookingsPage() {
                     <TableCell>
                       <BookingStatusBadge status={booking.bookingStatus} />
                     </TableCell>
-                    <TableCell className="text-right">
-                      <Link
-                        href={`/equipment/${booking.equipmentId}`}
-                        className={buttonVariants({ variant: "outline", size: "sm" })}
-                      >
-                        View
-                      </Link>
+                    <TableCell>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <Link
+                          href={`/equipment/${booking.equipmentId}`}
+                          className={buttonVariants({ variant: "outline", size: "sm" })}
+                        >
+                          View
+                        </Link>
+                        {booking.bookingStatus === "completed" &&
+                          !reviewed[booking._id] && (
+                            <button
+                              onClick={() => setReviewTarget(booking)}
+                              className={buttonVariants({ size: "sm" })}
+                            >
+                              Review
+                            </button>
+                          )}
+                        {reviewed[booking._id] && (
+                          <span className="self-center text-xs text-muted-foreground">
+                            Reviewed
+                          </span>
+                        )}
+                        {booking.bookingStatus === "pending" &&
+                          booking.paymentStatus === "pending" && (
+                            <button
+                              onClick={() => setCancelTarget(booking)}
+                              className={buttonVariants({
+                                variant: "destructive",
+                                size: "sm",
+                              })}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -165,6 +233,30 @@ export default function MyBookingsPage() {
             </div>
           </div>
         </>
+      )}
+
+      {cancelTarget && (
+        <ConfirmDialog
+          open
+          title="Cancel this booking?"
+          message="This cancels your unpaid booking and releases the dates. You have not been charged."
+          confirmLabel="Yes, cancel booking"
+          loading={cancelBusy}
+          onConfirm={cancelBooking}
+          onCancel={() => !cancelBusy && setCancelTarget(null)}
+        />
+      )}
+
+      {reviewTarget && (
+        <ReviewModal
+          booking={reviewTarget}
+          onClose={() => setReviewTarget(null)}
+          onSubmitted={(review) =>
+            setReviewed((prev) =>
+              review.bookingId ? { ...prev, [review.bookingId]: review } : prev
+            )
+          }
+        />
       )}
     </div>
   );

@@ -8,9 +8,11 @@ import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 import type { Equipment } from "@/lib/equipment";
-import { formatBDT } from "@/lib/format";
+import type { Review, ReviewListResponse, ReviewSummary } from "@/lib/reviews";
+import { formatBDT, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/status-badge";
 import { BookingModal } from "@/components/booking-modal";
+import { StarRating } from "@/components/star-rating";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 export default function EquipmentDetailPage() {
@@ -37,6 +39,8 @@ function EquipmentDetail() {
   const [favorited, setFavorited] = useState(false);
   const [favoriteBusy, setFavoriteBusy] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewSummary, setReviewSummary] = useState<ReviewSummary>({ average: 0, count: 0 });
 
   // No result for this id yet means the request is still in flight.
   const loading = state.id !== id;
@@ -77,6 +81,23 @@ function EquipmentDetail() {
       active = false;
     };
   }, [item?._id, userId]);
+
+  useEffect(() => {
+    if (!item?._id) return;
+    let active = true;
+    apiFetch<ReviewListResponse>(`/api/reviews?equipmentId=${item._id}&limit=6`)
+      .then((res) => {
+        if (!active) return;
+        setReviews(res.data);
+        setReviewSummary(res.summary);
+      })
+      .catch(() => {
+        /* Reviews are supplementary and should not block the listing. */
+      });
+    return () => {
+      active = false;
+    };
+  }, [item?._id]);
 
   async function toggleFavorite() {
     if (!item) return;
@@ -214,6 +235,44 @@ function EquipmentDetail() {
           </p>
         </div>
       </div>
+
+      <section className="mt-10">
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-xl font-semibold">Reviews</h2>
+          {reviewSummary.count > 0 && (
+            <>
+              <StarRating value={reviewSummary.average} />
+              <span className="text-sm text-muted-foreground">
+                {reviewSummary.average.toFixed(1)} · {reviewSummary.count} review
+                {reviewSummary.count === 1 ? "" : "s"}
+              </span>
+            </>
+          )}
+        </div>
+
+        {reviews.length === 0 ? (
+          <p className="mt-3 rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+            No reviews yet. Renters can review this item after a completed rental.
+          </p>
+        ) : (
+          <ul className="mt-4 space-y-4">
+            {reviews.map((review) => (
+              <li key={review._id} className="rounded-lg border bg-card p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{review.name}</p>
+                    <StarRating value={review.rating} />
+                  </div>
+                  <p className="text-xs text-muted-foreground">{formatDate(review.createdAt)}</p>
+                </div>
+                {review.comment && (
+                  <p className="mt-2 text-sm text-muted-foreground">{review.comment}</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {bookingOpen && canBook && (
         <BookingModal equipment={item} onClose={() => setBookingOpen(false)} />

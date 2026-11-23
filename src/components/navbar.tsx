@@ -85,6 +85,9 @@ export function Navbar() {
                 <DropdownMenuItem onClick={() => router.push("/dashboard/favorites")}>
                   Favorites
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/profile")}>
+                  Profile
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -126,6 +129,9 @@ export function Navbar() {
               </Link>
               <Link href="/dashboard/favorites" onClick={() => setOpen(false)} className="block py-1">
                 Favorites
+              </Link>
+              <Link href="/dashboard/profile" onClick={() => setOpen(false)} className="block py-1">
+                Profile
               </Link>
               <button onClick={handleLogout} className="block py-1">Logout</button>
             </>
